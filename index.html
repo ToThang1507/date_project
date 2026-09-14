@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lịch Hẹn Hò 💕 | Date Planner</title>
+<meta name="description" content="Lên lịch đi chơi cùng người thương: chọn ngày, chọn món ăn, quay random món và lưu lại lịch sử." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<div class="bg-decor" aria-hidden="true">
+  <span class="blob blob-1"></span>
+  <span class="blob blob-2"></span>
+  <span class="blob blob-3"></span>
+  <span class="float f1">🌸</span>
+  <span class="float f2">🥑</span>
+  <span class="float f3">🍡</span>
+  <span class="float f4">🫧</span>
+  <span class="float f5">💗</span>
+</div>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">
+      <span class="brand-emoji">💕</span>
+      <span class="brand-text">
+        <strong>Date Planner</strong>
+        <small>Lịch hẹn hò của chúng mình</small>
+      </span>
+    </a>
+    <nav class="top-nav">
+      <a href="#plan">Lên lịch</a>
+      <a href="#food">Món ăn</a>
+      <a href="#wheel">Vòng quay</a>
+      <a href="#history">Lịch sử</a>
+      <a href="gallery.html">Ảnh chung</a>
+    </nav>
+    <div class="store-badge" id="storeBadge" title="Trạng thái lưu trữ">
+      <span class="dot"></span><span id="storeBadgeText">Đang kết nối…</span>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero wrap">
+    <div class="hero-text">
+      <p class="eyebrow">✨ Hôm nay mình đi đâu nhỉ?</p>
+      <h1>Lên lịch đi chơi<br /><span class="hl">cùng người thương</span> 💗</h1>
+      <p class="lead">Chọn ngày, chọn quán, chọn món — và nếu hai đứa vẫn không quyết được thì cứ để <b>Vòng quay may mắn</b> quyết hộ nha!</p>
+      <div class="hero-actions">
+        <a href="#plan" class="btn btn-primary">Bắt đầu lên lịch 🗓️</a>
+        <a href="#wheel" class="btn btn-ghost">Quay món ngay 🎡</a>
+        <a href="gallery.html" class="btn btn-ghost">Ảnh chung 📷</a>
+      </div>
+      <div class="hero-stats">
+        <div><b id="statCount">0</b><span>buổi hẹn đã lên lịch</span></div>
+        <div><b id="statUpcoming">0</b><span>buổi sắp tới</span></div>
+        <div><b id="statFav">–</b><span>món hay chọn nhất</span></div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="polaroid">
+        <div class="polaroid-img">
+          <span class="pi pi-1">🧋</span><span class="pi pi-2">🍰</span><span class="pi pi-3">🎬</span><span class="pi pi-4">🌷</span>
+        </div>
+        <p class="polaroid-cap">"Mỗi buổi hẹn là một kỉ niệm nhỏ"</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEPPER ============ -->
+  <div class="wrap">
+    <ol class="stepper" id="stepper">
+      <li class="active" data-step="1"><span>1</span>Ngày &amp; giờ</li>
+      <li data-step="2"><span>2</span>Món ăn</li>
+      <li data-step="3"><span>3</span>Xác nhận</li>
+    </ol>
+  </div>
+
+  <!-- ============ BƯỚC 1: NGÀY & GIỜ ============ -->
+  <section class="wrap panel" id="plan">
+    <div class="panel-head">
+      <h2>🗓️ Bước 1 — Chọn ngày &amp; giờ hẹn</h2>
+      <p>Chọn một ngày trên lịch, rồi chọn khung giờ và địa điểm nha.</p>
+    </div>
+
+    <div class="grid-2">
+      <!-- Calendar -->
+      <div class="card calendar-card">
+        <div class="cal-head">
+          <button class="cal-nav" id="prevMonth" aria-label="Tháng trước">‹</button>
+          <h3 id="calTitle">Tháng 1 2026</h3>
+          <button class="cal-nav" id="nextMonth" aria-label="Tháng sau">›</button>
+        </div>
+        <div class="cal-dow">
+          <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <span><i class="lg lg-today"></i> Hôm nay</span>
+          <span><i class="lg lg-sel"></i> Đang chọn</span>
+          <span><i class="lg lg-has"></i> Đã có hẹn</span>
+        </div>
+      </div>
+
+      <!-- Time + place -->
+      <div class="stack">
+        <div class="card">
+          <h3 class="card-title">⏰ Khung giờ</h3>
+          <div class="chip-row" id="timeSlots">
+            <button class="chip" data-time="08:00">🌅 08:00 Sáng sớm</button>
+            <button class="chip" data-time="10:00">☕ 10:00 Cà phê</button>
+            <button class="chip" data-time="12:00">🍽️ 12:00 Ăn trưa</button>
+            <button class="chip" data-time="15:00">🧋 15:00 Trà chiều</button>
+            <button class="chip" data-time="18:00">🌇 18:00 Ăn tối</button>
+            <button class="chip" data-time="20:00">🌙 20:00 Đi dạo</button>
+          </div>
+          <label class="field">
+            <span>Hoặc chọn giờ khác</span>
+            <input type="time" id="customTime" />
+          </label>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">📍 Địa điểm &amp; hoạt động</h3>
+          <label class="field">
+            <span>Địa điểm</span>
+            <input type="text" id="placeInput" placeholder="VD: Highlands Nguyễn Huệ, rạp CGV…" />
+          </label>
+          <div class="chip-row small" id="activityChips">
+            <button class="chip" data-act="🎬 Xem phim">🎬 Xem phim</button>
+            <button class="chip" data-act="☕ Cà phê">☕ Cà phê</button>
+            <button class="chip" data-act="🛍️ Đi dạo mall">🛍️ Đi dạo mall</button>
+            <button class="chip" data-act="🎤 Karaoke">🎤 Karaoke</button>
+            <button class="chip" data-act="🌳 Công viên">🌳 Công viên</button>
+            <button class="chip" data-act="🎮 Game center">🎮 Game center</button>
+            <button class="chip" data-act="📷 Chụp ảnh">📷 Chụp ảnh</button>
+            <button class="chip" data-act="🏍️ Đi phượt">🏍️ Đi phượt</button>
+          </div>
+          <label class="field">
+            <span>Lời nhắn nhỏ 💌</span>
+            <textarea id="noteInput" rows="2" placeholder="VD: Nhớ mang theo áo khoác nha bé ơi…"></textarea>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BƯỚC 2: MÓN ĂN ============ -->
+  <section class="wrap panel" id="food">
+    <div class="panel-head">
+      <h2>🍜 Bước 2 — Chọn món ăn &amp; nước uống</h2>
+      <p>Mỗi buổi hẹn chọn <b>1 món ăn</b> và <b>1 nước uống</b>. Bấm vào món để chọn luôn, hoặc bấm nút <b>🎡</b> ở góc món để bỏ vào <b>bảng chọn</b> rồi quay random giữa những món đó.</p>
+    </div>
+
+    <div class="card pick-card">
+      <div class="pick-head">
+        <h3 class="card-title">🍜 Món ăn <span class="pick-hint">chọn 1</span></h3>
+        <div class="food-search">
+          <input type="search" id="foodSearch" placeholder="🔎 Tìm món…" />
+          <button class="btn btn-mini" id="addCustomFood">+ Thêm món</button>
+        </div>
+      </div>
+      <div class="chip-row filters" id="foodFilters"></div>
+      <div class="food-grid" id="foodGrid"></div>
+    </div>
+
+    <div class="card pick-card">
+      <div class="pick-head">
+        <h3 class="card-title">🧋 Nước uống <span class="pick-hint">chọn 1</span></h3>
+        <button class="btn btn-mini" id="addCustomDrink">+ Thêm nước</button>
+      </div>
+      <div class="food-grid drink-grid" id="drinkGrid"></div>
+    </div>
+
+    <div class="card shortlist-card" id="shortlistCard">
+      <div class="pick-head">
+        <h3 class="card-title">🎡 Bảng chọn để quay <span class="pick-hint" id="shortCount">0 món</span></h3>
+        <button class="btn btn-mini btn-danger" id="clearShortlist" hidden>Xoá bảng chọn</button>
+      </div>
+      <p class="shortlist-desc">Bỏ vào đây những món đang phân vân, rồi để vòng quay chọn giúp. Bấm 🎡 ở góc mỗi món để thêm hoặc bỏ ra.</p>
+
+      <div class="shortlist-group">
+        <div class="sg-head"><b>🍜 Món ăn</b> <span class="sg-count" id="sgFoodCount">0</span></div>
+        <div class="tag-row" id="shortFoods"></div>
+        <button class="btn btn-mini" id="spinFoodBtn" disabled>🎡 Quay món ăn</button>
+      </div>
+
+      <div class="shortlist-group">
+        <div class="sg-head"><b>🧋 Nước uống</b> <span class="sg-count" id="sgDrinkCount">0</span></div>
+        <div class="tag-row" id="shortDrinks"></div>
+        <button class="btn btn-mini" id="spinDrinkBtn" disabled>🎡 Quay nước uống</button>
+      </div>
+    </div>
+
+    <div class="card picked-card">
+      <b class="picked-title">Đã chọn cho buổi hẹn</b>
+      <div class="picked-row">
+        <div class="picked-slot empty" id="slotFood" data-kind="food"></div>
+        <div class="picked-slot empty" id="slotDrink" data-kind="drink"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VÒNG QUAY ============ -->
+  <section class="wrap panel" id="wheel">
+    <div class="panel-head">
+      <h2>🎡 Vòng quay may mắn</h2>
+      <p>Không quyết được ăn gì, uống gì? Để vũ trụ quyết định giúp hai đứa!</p>
+    </div>
+
+    <div class="card wheel-card">
+      <div class="wheel-wrap">
+        <div class="wheel-pointer">▼</div>
+        <canvas id="wheelCanvas" width="440" height="440" role="img" aria-label="Vòng quay chọn món"></canvas>
+        <button class="wheel-center" id="spinBtn">QUAY!</button>
+      </div>
+      <div class="wheel-side">
+        <div class="wheel-tabs" id="wheelTabs" role="tablist">
+          <button class="wtab active" data-mode="food" role="tab" aria-selected="true">🍜 Món ăn</button>
+          <button class="wtab" data-mode="drink" role="tab" aria-selected="false">🧋 Nước uống</button>
+        </div>
+
+        <div class="wheel-source">
+          <div class="src-toggle" id="wheelSrc">
+            <button class="src-btn active" data-src="short">🎯 Bảng chọn <b id="srcCount">(0)</b></button>
+            <button class="src-btn" data-src="all">🌈 Cả danh sách</button>
+          </div>
+          <label class="field" id="wheelCatField">
+            <span>Quay trong nhóm</span>
+            <select id="wheelCategory" class="select"></select>
+          </label>
+          <button class="btn btn-mini" id="reshuffleBtn">🔀 Xáo lại vòng quay</button>
+        </div>
+
+        <div class="wheel-result" id="wheelResult">
+          <span class="wr-emoji">🎁</span>
+          <p class="wr-label">Kết quả sẽ hiện ở đây</p>
+          <button class="btn btn-mini btn-mint" id="useResultBtn" hidden>Chốt món này cho buổi hẹn ✔</button>
+        </div>
+        <p class="hint" id="wheelHint">💡 Chốt xong, món này sẽ <b>thay thế</b> lựa chọn cũ — mỗi buổi hẹn chỉ giữ 1 món ăn và 1 nước uống.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BƯỚC 3: XÁC NHẬN ============ -->
+  <section class="wrap panel" id="confirm">
+    <div class="panel-head">
+      <h2>💝 Bước 3 — Xác nhận buổi hẹn</h2>
+      <p>Kiểm tra lại lần cuối rồi lưu lại làm kỉ niệm nha.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card summary-card">
+        <h3 class="card-title">Tóm tắt buổi hẹn</h3>
+        <ul class="summary">
+          <li><span>🗓️ Ngày</span><b id="sumDate">—</b></li>
+          <li><span>⏰ Giờ</span><b id="sumTime">—</b></li>
+          <li><span>📍 Địa điểm</span><b id="sumPlace">—</b></li>
+          <li><span>🎯 Hoạt động</span><b id="sumAct">—</b></li>
+          <li><span>🍜 Món ăn</span><b id="sumFood">—</b></li>
+          <li><span>🧋 Nước uống</span><b id="sumDrink">—</b></li>
+          <li><span>💌 Lời nhắn</span><b id="sumNote">—</b></li>
+        </ul>
+      </div>
+      <div class="card confirm-card">
+        <div class="couple">
+          <label class="field"><span>Tên của bạn</span><input type="text" id="meInput" placeholder="Anh…" /></label>
+          <label class="field"><span>Tên người ấy</span><input type="text" id="herInput" placeholder="Bé…" /></label>
+        </div>
+        <div class="mood-row">
+          <span>Tâm trạng mong đợi:</span>
+          <div class="chip-row small" id="moodChips">
+            <button class="chip" data-mood="🥰 Ngọt ngào">🥰</button>
+            <button class="chip" data-mood="🤩 Hào hứng">🤩</button>
+            <button class="chip" data-mood="😌 Nhẹ nhàng">😌</button>
+            <button class="chip" data-mood="🤪 Quậy tưng">🤪</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" id="saveBtn">Lưu buổi hẹn này 💖</button>
+        <button class="btn btn-ghost btn-block" id="resetBtn">Xoá form, làm lại</button>
+        <p class="hint" id="saveHint">Lịch sử được lưu vào Firebase (nếu đã cấu hình), nếu không sẽ lưu ngay trên máy bạn.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LỊCH SỬ ============ -->
+  <section class="wrap panel" id="history">
+    <div class="panel-head">
+      <h2>📖 Lịch sử đặt lịch</h2>
+      <p>Tất cả những buổi hẹn hai đứa đã lên kế hoạch.</p>
+    </div>
+
+    <div class="history-toolbar">
+      <div class="chip-row small" id="historyFilters">
+        <button class="chip active" data-hf="all">Tất cả</button>
+        <button class="chip" data-hf="upcoming">Sắp tới</button>
+        <button class="chip" data-hf="past">Đã qua</button>
+      </div>
+      <div class="history-tools">
+        <button class="btn btn-mini" id="exportBtn">⬇ Xuất JSON</button>
+        <button class="btn btn-mini btn-danger" id="clearAllBtn">🗑 Xoá tất cả</button>
+      </div>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Made with 💗 &amp; 🥑 — Date Planner</p>
+    <p class="tiny">Chúc hai bạn luôn hạnh phúc bên nhau nha ✨</p>
+  </div>
+</footer>
+
+<!-- Modal thêm món -->
+<div class="modal" id="foodModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="fmTitle">
+    <h3 id="fmTitle">🍽️ Thêm món mới</h3>
+    <p id="fmDesc">Món này sẽ được lưu lại và hiện trong danh sách ở những lần sau.</p>
+
+    <label class="field">
+      <span>Tên món</span>
+      <input type="text" id="fmName" placeholder="VD: Bánh canh cua" maxlength="40" />
+    </label>
+
+    <label class="field">
+      <span>Emoji</span>
+      <input type="text" id="fmEmoji" value="🍽️" maxlength="4" />
+    </label>
+    <div class="emoji-picker" id="fmEmojiPicker"></div>
+
+    <label class="field">
+      <span>Thuộc nhóm</span>
+      <select id="fmCat" class="select"></select>
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="fmCancel">Huỷ</button>
+      <button class="btn btn-primary" id="fmSave">Thêm món 🎉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Confetti canvas -->
+<canvas id="confetti" class="confetti"></canvas>
+
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

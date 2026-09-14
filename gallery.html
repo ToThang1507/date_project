@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ảnh Chung 📷 | Date Planner</title>
+<meta name="description" content="Album ảnh chung của hai đứa — tải ảnh lên Google Drive và xem ngay trên web." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+<div class="bg-decor" aria-hidden="true">
+  <span class="blob blob-1"></span>
+  <span class="blob blob-2"></span>
+  <span class="blob blob-3"></span>
+  <span class="float f1">📸</span>
+  <span class="float f2">🥑</span>
+  <span class="float f3">🌸</span>
+  <span class="float f4">🫧</span>
+</div>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-emoji">💕</span>
+      <span class="brand-text">
+        <strong>Date Planner</strong>
+        <small>Lịch hẹn hò của chúng mình</small>
+      </span>
+    </a>
+    <nav class="top-nav">
+      <a href="index.html#plan">Lên lịch</a>
+      <a href="index.html#food">Món ăn</a>
+      <a href="index.html#wheel">Vòng quay</a>
+      <a href="index.html#history">Lịch sử</a>
+      <a href="gallery.html" class="current">Ảnh chung</a>
+    </nav>
+    <div class="store-badge" id="driveBadge" title="Trạng thái Google Drive">
+      <span class="dot"></span><span id="driveBadgeText">Đang kiểm tra…</span>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="wrap gallery-hero">
+    <div>
+      <p class="eyebrow">📷 Album của hai đứa</p>
+      <h1>Ảnh chung <span class="hl">của chúng mình</span></h1>
+      <p class="lead">Tải ảnh lên Google Drive rồi xem lại ngay tại đây. Mỗi tấm ảnh có thể gắn với một buổi hẹn trong lịch sử.</p>
+    </div>
+    <div class="gallery-stats">
+      <div><b id="gsTotal">0</b><span>tấm ảnh</span></div>
+      <div><b id="gsDates">0</b><span>buổi hẹn có ảnh</span></div>
+      <div><b id="gsSize">0</b><span>dung lượng</span></div>
+    </div>
+  </section>
+
+  <!-- ---------- Kết nối Drive ---------- -->
+  <section class="wrap">
+    <div class="card drive-bar" id="driveBar">
+      <div class="drive-info">
+        <span class="drive-icon">☁️</span>
+        <div>
+          <b id="driveTitle">Google Drive</b>
+          <p class="tiny" id="driveDesc">Đang kiểm tra cấu hình…</p>
+        </div>
+      </div>
+      <div class="drive-actions">
+        <button class="btn btn-primary" id="driveSignIn" hidden>Kết nối Google Drive</button>
+        <button class="btn btn-ghost btn-mini" id="driveSignOut" hidden>Ngắt kết nối</button>
+        <a class="btn btn-ghost btn-mini" id="driveOpen" href="#" target="_blank" rel="noopener" hidden>Mở thư mục Drive ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- Tải ảnh lên ---------- -->
+  <section class="wrap panel" id="upload">
+    <div class="panel-head">
+      <h2>⬆️ Tải ảnh lên</h2>
+      <p>Kéo thả ảnh vào khung bên dưới, hoặc bấm để chọn từ máy / chụp bằng điện thoại.</p>
+    </div>
+
+    <div class="card">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Chọn hoặc kéo thả ảnh vào đây">
+        <span class="dz-emoji">🖼️</span>
+        <b>Kéo thả ảnh vào đây</b>
+        <span class="tiny">hoặc bấm để chọn · JPG, PNG, HEIC, WEBP · nhiều ảnh cùng lúc</span>
+        <input type="file" id="fileInput" accept="image/*" multiple hidden />
+      </div>
+
+      <div class="upload-meta">
+        <label class="field">
+          <span>Gắn với buổi hẹn</span>
+          <select id="linkDate" class="select"><option value="">— Không gắn buổi hẹn nào —</option></select>
+        </label>
+        <label class="field">
+          <span>Ngày chụp</span>
+          <input type="date" id="takenAt" />
+        </label>
+        <label class="field">
+          <span>Cần chú chung cho lô ảnh này</span>
+          <input type="text" id="captionInput" placeholder="VD: Buổi tối ở phố đi bộ 🌙" />
+        </label>
+      </div>
+
+      <div class="queue" id="queue" hidden></div>
+    </div>
+  </section>
+
+  <!-- ---------- Album ---------- -->
+  <section class="wrap panel" id="album">
+    <div class="panel-head">
+      <h2>🖼️ Album</h2>
+      <p>Bấm vào ảnh để xem lớn.</p>
+    </div>
+
+    <div class="history-toolbar">
+      <div class="chip-row small" id="albumFilters">
+        <button class="chip active" data-gf="all">Tất cả</button>
+        <button class="chip" data-gf="linked">Có gắn buổi hẹn</button>
+        <button class="chip" data-gf="free">Ảnh lẻ</button>
+      </div>
+      <div class="history-tools">
+        <button class="btn btn-mini" id="groupToggle">🗂 Nhóm theo buổi hẹn</button>
+        <button class="btn btn-mini btn-danger" id="clearPhotos">🗑 Xoá tất cả ảnh</button>
+      </div>
+    </div>
+
+    <div id="albumBody"></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Made with 💗 &amp; 🥑 — Date Planner</p>
+    <p class="tiny">Chúc hai bạn luôn hạnh phúc bên nhau nha ✨</p>
+  </div>
+</footer>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lb-close" id="lbClose" aria-label="Đóng">×</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Ảnh trước">‹</button>
+  <figure class="lb-figure">
+    <img id="lbImg" alt="" />
+    <figcaption id="lbCap"></figcaption>
+  </figure>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Ảnh sau">›</button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="assets/js/gallery.js"></script>
+</body>
+</html>

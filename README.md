@@ -66,6 +66,10 @@ Rồi mở http://localhost:8080
 
 ## 🔥 Bật Firebase Firestore (lưu lịch sử lên cloud)
 
+> ✅ **Đã cấu hình sẵn** cho project `date-app-ece8c` trong `assets/js/config.js`.
+> Chỉ còn phải làm **bước 5** (tạo database trong Firebase Console) là xong —
+> hiện Cloud Firestore API của project chưa được bật nên app vẫn đang chạy ở chế độ localStorage.
+
 1. Vào <https://console.firebase.google.com> → **Add project** (miễn phí).
 2. Trong project, bấm icon **`</>`** (Web) → đặt tên app → **Register app**.
 3. Copy đoạn `firebaseConfig` hiện ra.
@@ -95,8 +99,9 @@ Test mode sẽ hết hạn sau 30 ngày. Vào **Firestore → Rules** và dán:
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /dates/{doc} {
-      allow read, write: if true;   // web riêng tư, không có đăng nhập
+    // app dùng 3 collection: dates (buổi hẹn), photos (ảnh), customFoods (món tự thêm)
+    match /{col}/{doc} {
+      allow read, write: if col in ['dates', 'photos', 'customFoods'];
     }
   }
 }

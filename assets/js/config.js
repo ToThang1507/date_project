@@ -15,12 +15,13 @@
  * localStorage của trình duyệt.
  */
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyBjfkg3w9sUR-z3qT53Dd38oHl8RQSsjJg",
+  authDomain: "date-app-ece8c.firebaseapp.com",
+  projectId: "date-app-ece8c",
+  storageBucket: "date-app-ece8c.firebasestorage.app",
+  messagingSenderId: "885136155029",
+  appId: "1:885136155029:web:43b717613afb8dba72569c",
+  measurementId: "G-MYCVYK2MSQ"
 };
 
 /** Tên collection trên Firestore */

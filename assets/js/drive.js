@@ -198,6 +198,14 @@ export const drive = {
   }
 };
 
+/**
+ * Link ảnh công khai.
+ * Dùng thẳng lh3.googleusercontent.com — đây chính là nơi
+ * drive.google.com/thumbnail redirect tới, nhưng gọi thẳng thì:
+ *   - không qua bước redirect của drive.google.com (bước hay bị Safari/iOS
+ *     chặn vì chính sách chặn cookie bên thứ ba),
+ *   - không bị giới hạn tần suất gắt như endpoint /thumbnail.
+ */
 export function thumbUrlOf(fileId, size = 800) {
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
+  return `https://lh3.googleusercontent.com/d/${fileId}=w${size}`;
 }

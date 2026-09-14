@@ -218,7 +218,9 @@ async function urlFor(photo) {
   let url = "";
   if (photo.source === "drive") {
     if (photo.isPublic) {
-      url = photo.thumbUrl || thumbUrlOf(photo.driveId);
+      // luôn tự dựng link từ driveId, KHÔNG dùng photo.thumbUrl đã lưu —
+      // ảnh upload từ bản cũ còn giữ link drive.google.com/thumbnail hay lỗi
+      url = photo.driveId ? thumbUrlOf(photo.driveId) : photo.thumbUrl;
     } else if (drive.signedIn) {
       try { url = await drive.blobUrl(photo.driveId); }
       catch (err) { console.warn(err); }
@@ -229,6 +231,25 @@ async function urlFor(photo) {
   }
   state.urls.set(photo.id, url);
   return url;
+}
+
+/**
+ * Tải ảnh qua Drive API bằng access token — phương án dự phòng khi link công
+ * khai không hiện được (chưa share, trình duyệt chặn, hoặc bị giới hạn tần
+ * suất). Chỉ chạy được khi đã đăng nhập Drive.
+ */
+async function blobUrlFor(photo) {
+  const cached = state.urls.get(photo.id);
+  if (cached && cached.startsWith("blob:")) return cached;
+  if (photo.source !== "drive" || !photo.driveId || !drive.signedIn) return "";
+  try {
+    const url = await drive.blobUrl(photo.driveId);
+    state.urls.set(photo.id, url);
+    return url;
+  } catch (err) {
+    console.warn("[gallery] tải ảnh qua Drive API cũng lỗi:", err);
+    return "";
+  }
 }
 
 function filtered() {
@@ -324,8 +345,14 @@ function gridOf(list) {
       const img = new Image();
       img.alt = p.caption || p.name || "Ảnh chung";
       img.onload = () => holder.classList.add("loaded");
-      img.onerror = () => {
+      const showFail = () => {
         holder.innerHTML = `<div class="ph-fail">😢<span class="tiny">Không tải được ảnh</span></div>`;
+      };
+      img.onerror = async () => {
+        const fallback = await blobUrlFor(p);
+        if (!fallback || fallback === img.src) return showFail();
+        img.onerror = showFail;   // lần hai vẫn lỗi thì chịu
+        img.src = fallback;
       };
       // phải gắn vào DOM trước rồi mới đặt src, nếu không loading="lazy" sẽ không bao giờ tải
       holder.appendChild(img);
@@ -383,8 +410,14 @@ async function showLightbox() {
   const p = state.visible[lbIndex];
   if (!p) return;
   const url = await urlFor(p);
-  $("#lbImg").src = url || "";
-  $("#lbImg").alt = p.caption || p.name || "Ảnh";
+  const lbImg = $("#lbImg");
+  lbImg.onerror = async () => {
+    lbImg.onerror = null;
+    const fallback = await blobUrlFor(p);
+    if (fallback) lbImg.src = fallback;
+  };
+  lbImg.src = url || "";
+  lbImg.alt = p.caption || p.name || "Ảnh";
   $("#lbCap").textContent =
     [p.caption || p.name, p.takenAt ? prettyDate(p.takenAt) : ""].filter(Boolean).join(" · ");
 }

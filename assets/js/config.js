@@ -52,7 +52,7 @@ export const ALLOW_PAST_DATES = false;
  *
  * Để trống -> trang Ảnh vẫn chạy, ảnh lưu ngay trong trình duyệt (chế độ offline).
  */
-export const GOOGLE_CLIENT_ID = "";
+export const GOOGLE_CLIENT_ID = "885136155029-0aqkmf0mpuv16fj4njai8h2r1tegluk7.apps.googleusercontent.com";
 
 /** Tên thư mục sẽ được tạo trong Google Drive của anh */
 export const DRIVE_FOLDER_NAME = "Date Planner Photos";

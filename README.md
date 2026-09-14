@@ -1,0 +1,156 @@
+# 💕 Date Planner — Lịch hẹn hò
+
+Web tĩnh (HTML + CSS + JavaScript thuần) để lên lịch đi chơi cùng người thương:
+chọn ngày ⏤ chọn giờ & địa điểm ⏤ chọn món ăn ⏤ **vòng quay random món** ⏤ lưu lịch sử.
+
+Tone màu: **hồng · xanh mint · xanh bơ** 🌸🌿🥑
+
+---
+
+## ✨ Tính năng
+
+| Nhóm | Chi tiết |
+|---|---|
+| 🗓️ Chọn ngày | Lịch tự viết, đánh dấu hôm nay / ngày đang chọn / ngày đã có hẹn, chặn ngày quá khứ |
+| ⏰ Chọn giờ | 6 khung giờ gợi ý + chọn giờ tự do |
+| 📍 Địa điểm | Nhập tên quán + 8 chip hoạt động (xem phim, cà phê, karaoke…) + lời nhắn |
+| 🍜 Món ăn | 60+ món chia 7 nhóm, tìm kiếm, chọn nhiều, tự thêm món mới |
+| 🎡 Vòng quay | Canvas có animation, quay từ "món đã chọn" / "tất cả" / "theo nhóm", pháo giấy khi ra kết quả |
+| 💾 Lịch sử | Lưu Firebase Firestore (hoặc localStorage), lọc sắp tới / đã qua, dùng lại, xoá, xuất JSON |
+| 📊 Thống kê | Số buổi hẹn, số buổi sắp tới, món hay chọn nhất |
+| 📱 Responsive | Chạy đẹp trên điện thoại |
+
+---
+
+## 📁 Cấu trúc
+
+```
+date-planner/
+├── index.html
+├── assets/
+│   ├── css/style.css
+│   └── js/
+│       ├── config.js   ← CHỈ CẦN SỬA FILE NÀY
+│       ├── foods.js    ← danh sách món ăn
+│       ├── store.js    ← Firestore + localStorage
+│       ├── wheel.js    ← vòng quay
+│       └── app.js      ← logic chính
+├── .github/workflows/deploy.yml
+└── README.md
+```
+
+---
+
+## 🚀 Chạy thử ở máy
+
+Vì dùng ES modules nên **không mở trực tiếp file `index.html`** (lỗi CORS). Chạy 1 server nhỏ:
+
+```bash
+# Python
+python3 -m http.server 8080
+
+# hoặc Node
+npx serve .
+```
+
+Rồi mở http://localhost:8080
+
+---
+
+## 🔥 Bật Firebase Firestore (lưu lịch sử lên cloud)
+
+1. Vào <https://console.firebase.google.com> → **Add project** (miễn phí).
+2. Trong project, bấm icon **`</>`** (Web) → đặt tên app → **Register app**.
+3. Copy đoạn `firebaseConfig` hiện ra.
+4. Mở `assets/js/config.js`, dán các giá trị vào:
+
+```js
+export const firebaseConfig = {
+  apiKey: "AIza...",
+  authDomain: "xxx.firebaseapp.com",
+  projectId: "xxx",
+  storageBucket: "xxx.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123:web:abc"
+};
+```
+
+5. Menu trái → **Build → Firestore Database → Create database** → chọn **Start in test mode** → chọn region `asia-southeast1`.
+6. Xong! Reload web, badge góc phải sẽ hiện **Firebase ☁️**.
+
+> **Nếu chưa cấu hình gì**, web vẫn chạy 100% và lưu lịch sử vào trình duyệt (badge hiện **Lưu trên máy 💾**).
+
+### Rules nên dùng sau khi test xong
+
+Test mode sẽ hết hạn sau 30 ngày. Vào **Firestore → Rules** và dán:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /dates/{doc} {
+      allow read, write: if true;   // web riêng tư, không có đăng nhập
+    }
+  }
+}
+```
+
+⚠️ Rule này cho phép mọi người biết `projectId` đều ghi được. Đây là web cá nhân
+nhỏ nên chấp nhận được; nếu muốn chặt hơn thì bật **Firebase Authentication
+(Anonymous / Google)** rồi đổi thành `if request.auth != null;`.
+
+---
+
+## 🌐 Deploy lên GitHub Pages
+
+### Cách 1 — Nhanh nhất (không cần Actions)
+
+```bash
+cd date-planner
+git init
+git add .
+git commit -m "feat: date planner web"
+git branch -M main
+git remote add origin https://github.com/<username>/date-planner.git
+git push -u origin main
+```
+
+Vào repo trên GitHub → **Settings → Pages**:
+- **Source**: `Deploy from a branch`
+- **Branch**: `main` · thư mục `/ (root)` → **Save**
+
+Đợi ~1 phút, web sẽ ở: `https://<username>.github.io/date-planner/`
+
+### Cách 2 — Dùng GitHub Actions (đã có sẵn `.github/workflows/deploy.yml`)
+
+Vào **Settings → Pages → Source: GitHub Actions**. Từ đó mỗi lần `git push` lên
+`main` là web tự động deploy lại.
+
+---
+
+## 🍲 Thêm / sửa món ăn
+
+Mở `assets/js/foods.js`:
+
+```js
+{ emoji: "🍜", name: "Phở bò", cat: "vn" },
+```
+
+`cat` chọn 1 trong: `vn`, `asian`, `western`, `hotpot`, `street`, `dessert`, `drink`.
+(Hoặc bấm nút **+ Thêm món** ngay trên web để thêm nhanh trong lúc dùng.)
+
+---
+
+## 📬 Gửi thông báo về mail / tin nhắn (chưa bật)
+
+Phần này tạm bỏ qua theo yêu cầu. Khi cần bật, có 3 hướng dễ nhất cho web tĩnh:
+
+- **EmailJS** — gửi email thẳng từ trình duyệt, free 200 mail/tháng.
+- **Telegram Bot** — `https://api.telegram.org/bot<TOKEN>/sendMessage`, free không giới hạn.
+- **Discord Webhook** — `POST` vào URL webhook, setup nhanh nhất.
+
+Chỗ cần gắn: hàm `saveBtn` trong `assets/js/app.js`, ngay sau `await store.add(record)`.
+
+---
+
+Made with 💗 & 🥑

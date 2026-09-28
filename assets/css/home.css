@@ -1,0 +1,354 @@
+/* ============================================================
+   Our Time — trang chủ: bộ đếm + bảng ảnh polaroid kéo thả
+   ============================================================ */
+
+:root{
+  --bg:#faf6f2;
+  --paper:#fffdf9;
+  --ink:#27221f;
+  --muted:#7c726c;
+  --faint:#b8ada6;
+  --pink:#e58c9b;
+  --pink-deep:#d0667b;
+  --pink-soft:#fbe5e5;
+  --pink-line:#f1cfd3;
+  --line:#efe7e0;
+
+  --hand:"Patrick Hand", "Comic Sans MS", cursive;
+  --ui:"Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow:0 12px 28px rgba(92,60,48,.14), 0 2px 5px rgba(92,60,48,.08);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--ui);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+
+/* ---------- Header ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  height:84px;padding:0 40px;
+  background:rgba(253,250,247,.92);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.logo{display:flex;align-items:center;gap:14px;color:var(--ink);text-decoration:none}
+.logo svg{width:32px;height:32px;fill:#e27488}
+.logo span{font-family:var(--hand);font-size:28px;letter-spacing:.8px}
+.nav{display:flex;align-items:center;gap:6px}
+.nav-link{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:10px 22px;border:0;border-radius:999px;background:none;
+  color:#3b3430;font-size:15px;text-decoration:none;transition:background .2s,color .2s;
+}
+.nav-link:hover{background:#f6ecea}
+.nav-link.active{background:var(--pink-soft);color:var(--pink-deep)}
+.nav-link .ico{display:none}
+.nav-edit{
+  display:inline-flex;align-items:center;gap:6px;margin-left:8px;
+  padding:9px 18px;border-radius:999px;
+  border:1.5px solid var(--pink-line);background:#fff;color:var(--pink-deep);
+  font-size:14px;font-weight:600;transition:.2s;
+}
+.nav-edit:hover{border-color:var(--pink)}
+body.editing .nav-edit{background:var(--pink-deep);border-color:var(--pink-deep);color:#fff}
+
+/* ---------- Stage ---------- */
+.stage{
+  position:relative;isolation:isolate;
+  min-height:760px;padding:56px 16px 80px;
+  overflow-x:clip;
+  background:
+    radial-gradient(900px 420px at 50% 0%, rgba(252,228,226,.55), transparent 70%),
+    linear-gradient(180deg,#fbf6f2 0%,#f9f2ee 100%);
+}
+.doodle{
+  position:absolute;z-index:0;pointer-events:none;
+  fill:none;stroke:#e79aa7;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+}
+.d-tr{right:9%;top:96px;width:140px}
+.d-bl{left:2%;bottom:56px;width:170px}
+
+.hero{
+  position:relative;z-index:1;
+  max-width:820px;margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+}
+.hero-title{
+  position:relative;display:inline-block;margin:0;padding:0 48px;
+  font-family:var(--hand);font-weight:400;
+  font-size:clamp(40px,5.2vw,66px);line-height:1.15;letter-spacing:.5px;
+  -webkit-text-stroke:.7px currentColor;
+}
+.title-heart{
+  position:absolute;right:-4px;top:-20px;width:50px;transform:rotate(12deg);
+  fill:none;stroke:#e27488;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;
+}
+.hero-sub{
+  margin:18px 0 0;
+  font-family:var(--hand);font-size:clamp(17px,1.7vw,21px);letter-spacing:.6px;color:var(--muted);
+}
+.divider{display:flex;align-items:center;justify-content:center;gap:18px;margin:26px 0 30px;fill:var(--pink)}
+.divider span{width:40px;height:1.5px;background:#cfc5bf}
+.divider svg{width:18px;height:18px}
+
+.date-pill{
+  display:inline-flex;align-items:center;gap:18px;
+  padding:12px 56px 12px 28px;border-radius:999px;
+  background:var(--pink-soft);border:1px solid var(--pink-line);
+  text-align:left;
+}
+.date-pill svg{width:30px;height:30px;fill:none;stroke:#3a3431;stroke-width:1.7;stroke-linecap:round}
+.date-pill svg circle{fill:#3a3431;stroke:none}
+.date-pill small{display:block;font-size:15px;color:var(--muted)}
+.date-pill b{display:block;margin-top:2px;font-size:21px;font-weight:500;letter-spacing:.3px}
+
+.counter-card{
+  width:min(810px,100%);margin-top:24px;padding:34px 48px 40px;
+  border-radius:20px;border:1px solid var(--pink-line);
+  background:linear-gradient(180deg,#fde8e7,#fbe2e2);
+}
+.counter-label{margin:0 0 20px;font-size:21px;font-weight:500}
+.counter{display:grid;grid-template-columns:repeat(4,1fr)}
+.unit{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px}
+.unit + .unit::before{content:"";position:absolute;left:0;top:18px;width:1px;height:58px;background:#eac5c8}
+.unit b{font-size:clamp(38px,6vw,80px);font-weight:800;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.unit span{font-size:17px;color:var(--muted)}
+
+
+/* ---------- Board & items ---------- */
+.board{position:absolute;inset:0;z-index:2;pointer-events:none}
+.item{
+  position:absolute;
+  width:var(--w,240px);
+  transform:rotate(var(--rot,0deg));
+  pointer-events:auto;
+  user-select:none;-webkit-user-select:none;
+  transition:filter .2s;
+}
+.item img{-webkit-user-drag:none}
+body.editing .item{cursor:grab}
+body.editing .item.selected{outline:2px dashed var(--pink);outline-offset:8px;border-radius:4px}
+.item.dragging{cursor:grabbing;filter:drop-shadow(0 18px 22px rgba(80,50,40,.2))}
+
+/* Polaroid */
+.frame{background:var(--paper);padding:12px 12px 0;border-radius:2px;box-shadow:var(--shadow)}
+.pic{aspect-ratio:1/.88;overflow:hidden;background:#eee}
+.pic img{display:block;width:100%;height:100%;object-fit:cover}
+.ph{display:grid;place-items:center;width:100%;height:100%}
+.ph span{padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.2);color:#fff;font-size:13px;opacity:0;transition:opacity .2s}
+body.editing .ph{cursor:pointer}
+body.editing .ph span{opacity:1}
+.ph-sunset{background:linear-gradient(180deg,#6f7fb5 0%,#b99ac4 32%,#f0a7a9 58%,#f6c8a7 72%,#474a63 73%,#2c2d3d 100%)}
+.ph-hills{background:linear-gradient(180deg,#8ec5f0 0%,#d4ebf8 44%,#93b7a3 45%,#6f9a78 60%,#bcd89f 61%,#8fbf6d 100%)}
+.ph-blank{background:repeating-linear-gradient(45deg,#f3ece7 0 12px,#eee5df 12px 24px)}
+.cap{
+  min-height:54px;padding:12px 6px 16px;
+  font-family:var(--hand);font-size:22px;line-height:1.2;letter-spacing:.5px;color:#3a332f;
+  text-align:center;white-space:pre-wrap;word-break:break-word;
+}
+
+/* Băng dính washi */
+.tape{
+  position:absolute;z-index:2;top:-15px;left:32%;
+  width:42%;max-width:110px;height:30px;
+  transform:translateX(-50%) rotate(-6deg);
+  clip-path:polygon(2% 0,98% 0,100% 20%,97% 40%,100% 60%,97% 80%,100% 100%,2% 100%,0 80%,3% 60%,0 40%,3% 20%);
+}
+.tape-pink{background:rgba(242,164,174,.72)}
+.tape-mint{background:rgba(160,219,196,.75)}
+.tape-yellow{background:rgba(247,218,140,.78)}
+
+/* Sticky note lời nhắn dưới ảnh */
+.sticky{
+  position:relative;display:none;
+  width:86%;margin:16px auto 0;padding:16px 14px 18px;
+  transform:rotate(2.5deg);
+  box-shadow:0 8px 14px rgba(92,60,48,.12);
+}
+.item-photo.has-note .sticky,
+body.editing .item-photo .sticky{display:block}
+.sticky::before,
+.note-body::before{
+  content:"";position:absolute;top:-9px;left:50%;
+  width:56px;height:18px;transform:translateX(-50%) rotate(3deg);
+  background:rgba(255,255,255,.6);box-shadow:0 1px 2px rgba(0,0,0,.06);
+}
+.sticky-text,
+.note-text{
+  min-height:1.4em;outline:none;
+  font-family:var(--hand);line-height:1.4;letter-spacing:.3px;color:#4a3f38;
+  white-space:pre-wrap;word-break:break-word;
+}
+.sticky-text{font-size:19px}
+
+/* Ghi chú tự do */
+.note-body{position:relative;min-height:90px;padding:22px 18px 24px;box-shadow:0 10px 18px rgba(92,60,48,.13)}
+.note-text{font-size:22px}
+.note-body.c-ink{min-height:0;padding:10px 8px}
+.note-body.c-ink .note-text{font-size:23px;text-align:center;letter-spacing:.6px;color:#4b433d}
+
+.c-yellow{background:#fff3b5}
+.c-pink{background:#ffdbe0}
+.c-mint{background:#d5f2e3}
+.c-blue{background:#d8e9fb}
+.c-ink{background:transparent;box-shadow:none}
+.c-ink::before{display:none}
+body.editing .c-ink{outline:1.5px dashed #e6d8d0}
+
+/* Tay cầm xoay / đổi kích thước */
+.h{
+  position:absolute;z-index:3;display:none;
+  width:28px;height:28px;padding:0;border-radius:50%;
+  border:1.5px solid var(--pink);background:#fff;color:var(--pink-deep);
+  font-size:15px;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,.12);
+  touch-action:none;
+}
+body.editing .item.selected .h{display:grid;place-items:center}
+.h-rot{top:-18px;right:-18px;cursor:grab}
+.h-rot::before{content:"↻"}
+.h-size{bottom:-14px;right:-14px;border-radius:8px;cursor:nwse-resize}
+.h-size::before{content:"⤡"}
+
+/* ---------- Sửa chữ trực tiếp ---------- */
+body.editing [contenteditable="true"]{cursor:text;border-radius:4px}
+body.editing .item:not(.selected) [contenteditable="true"]{cursor:grab}
+.item [contenteditable="true"]{user-select:text;-webkit-user-select:text}
+body.editing [contenteditable="true"]:focus{outline:none;background:rgba(255,255,255,.55);box-shadow:0 0 0 2px rgba(229,140,155,.35)}
+body.editing [data-ph]:empty::before{content:attr(data-ph);color:var(--faint)}
+body.editing [data-setting]{outline:1.5px dashed transparent;outline-offset:4px}
+body.editing [data-setting]:hover{outline-color:var(--pink-line)}
+
+/* ---------- Thanh công cụ mục đang chọn ---------- */
+.item-bar{
+  position:absolute;z-index:1000;
+  display:flex;gap:2px;padding:5px;
+  background:#fff;border:1px solid var(--line);border-radius:999px;
+  box-shadow:0 10px 26px rgba(60,40,30,.16);
+}
+.item-bar[hidden]{display:none}
+.item-bar button{padding:8px 12px;border:0;border-radius:999px;background:none;font-size:13.5px;white-space:nowrap}
+.item-bar button:hover{background:#f7eeec}
+.item-bar button[hidden]{display:none}
+.item-bar .danger{color:#c9485f}
+
+/* ---------- Dock chỉnh sửa ---------- */
+.dock{
+  position:fixed;left:50%;bottom:22px;z-index:60;
+  display:flex;align-items:center;gap:8px;padding:8px;
+  background:#fff;border:1px solid var(--line);border-radius:999px;
+  box-shadow:0 14px 34px rgba(60,40,30,.18);
+  transform:translate(-50%,170%);
+  visibility:hidden;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s .3s;
+}
+body.editing .dock{transform:translate(-50%,0);visibility:visible;transition-delay:0s}
+.dock button{padding:11px 18px;border:0;border-radius:999px;background:var(--pink-soft);color:var(--pink-deep);font-size:14px;font-weight:600;white-space:nowrap}
+.dock button:hover{filter:brightness(.97)}
+.dock .primary{background:var(--pink-deep);color:#fff}
+.dock-hint{max-width:250px;padding:0 6px;font-size:12.5px;line-height:1.35;color:var(--muted)}
+
+/* ---------- Thả file ---------- */
+.drop-hint{
+  position:fixed;inset:12px;z-index:90;
+  display:grid;place-items:center;
+  border:3px dashed var(--pink);border-radius:24px;
+  background:rgba(251,229,229,.6);
+  font-family:var(--hand);font-size:34px;color:var(--pink-deep);
+  pointer-events:none;opacity:0;transition:opacity .15s;
+}
+body.dropping .drop-hint{opacity:1}
+
+/* ---------- Quote ---------- */
+.quote-sec{padding:56px 16px 72px;background:var(--paper);border-top:1px solid var(--line);text-align:center}
+.quote{margin:0;font-family:var(--hand);font-size:clamp(20px,2vw,25px);letter-spacing:1px;color:#3b342f}
+.divider.dark{margin:22px 0 0;fill:#2a2522}
+
+/* ---------- Settings dialog ---------- */
+.dlg{
+  width:min(460px,calc(100% - 32px));padding:0;border:0;border-radius:20px;
+  background:var(--paper);color:var(--ink);
+  box-shadow:0 30px 60px rgba(40,25,20,.25);
+}
+.dlg::backdrop{background:rgba(60,40,35,.35)}
+.dlg-inner{display:flex;flex-direction:column;gap:18px;padding:22px 26px 26px}
+.dlg header{display:flex;align-items:center;justify-content:space-between}
+.dlg h2{margin:0;font-family:var(--hand);font-size:30px;font-weight:400}
+.x{padding:0 4px;border:0;background:none;font-size:30px;line-height:1;color:var(--muted)}
+.fld > span{display:block;margin-bottom:8px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fld input[type=date]{width:100%;padding:10px 14px;border:1px solid var(--pink-line);border-radius:12px;background:#fff;font:inherit;color:inherit}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 16px;border:1px solid var(--pink-line);border-radius:999px;
+  background:#fff;font-size:14px;color:var(--ink);cursor:pointer;
+}
+.btn:hover{background:var(--pink-soft)}
+.btn.danger{color:#c24a60;border-color:#f0c5cd}
+.muted{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
+.tip{padding-top:4px;border-top:1px dashed var(--line)}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;left:50%;top:100px;z-index:100;
+  max-width:calc(100% - 32px);padding:10px 18px;border-radius:999px;
+  background:#2b2421;color:#fff;font-size:14px;text-align:center;
+  opacity:0;pointer-events:none;transform:translate(-50%,-16px);transition:.25s;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Desktop: kéo bằng cảm ứng trên tablet ---------- */
+@media (min-width:900px){
+  body.editing .item{touch-action:none}
+}
+
+/* ---------- Mobile: ảnh xếp thành lưới bên dưới bộ đếm ---------- */
+@media (max-width:899px){
+  .topbar{height:64px;padding:0 16px}
+  .logo{gap:10px}
+  .logo svg{width:26px;height:26px}
+  .logo span{font-size:23px}
+  .nav{gap:2px}
+  .nav-link{padding:8px 12px;font-size:14px}
+  .nav-edit{margin-left:4px;padding:7px 12px}
+
+  .stage{min-height:0 !important;padding:36px 16px 44px}
+  .doodle{display:none}
+  .hero-title{padding:0 32px}
+  .title-heart{top:-10px;right:-2px;width:34px}
+  .counter-card{padding:24px 8px 26px}
+  .unit{gap:10px}
+  .unit span{font-size:14px}
+  .unit + .unit::before{top:6px;height:40px}
+
+  .board{
+    position:relative;inset:auto;
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:36px 18px;
+    margin-top:40px;pointer-events:auto;
+  }
+  .board:empty{display:none}
+  .item{position:relative;left:auto !important;top:auto !important;z-index:auto !important;width:min(var(--w),44vw)}
+  .cap{font-size:18px;min-height:44px}
+  .sticky-text{font-size:16px}
+  .note-text,.note-body.c-ink .note-text{font-size:18px}
+
+  .dock{left:12px;right:12px;bottom:12px;justify-content:center;transform:translateY(170%)}
+  body.editing .dock{transform:none}
+  .dock-hint{display:none}
+}
+@media (max-width:520px){
+  .nav-link{padding:7px 9px;font-size:13px}
+  .nav-link .ico,.nav-edit .ico{display:inline}
+  .nav-link .lbl,.nav-edit .lbl{display:none}
+  .date-pill{gap:14px;padding:10px 32px 10px 20px}
+  .date-pill b{font-size:19px}
+  .dock button{padding:10px 14px;font-size:13px}
+}

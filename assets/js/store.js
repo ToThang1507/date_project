@@ -7,7 +7,7 @@
 import { firebaseConfig, COLLECTION } from "./config.js";
 
 const LS_KEY = "datePlanner.history.v1";
-const FB = "https://www.gstatic.com/firebasejs/10.12.2";
+export const FB = "https://www.gstatic.com/firebasejs/10.12.2";
 
 export const store = {
   mode: "local",   // "cloud" | "local"

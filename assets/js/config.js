@@ -34,3 +34,12 @@ export const DEFAULT_NAMES = {
 
 /** Có cho phép chọn ngày trong quá khứ không */
 export const ALLOW_PAST_DATES = false;
+
+/**
+ * Trang chủ "Our Time"
+ * --------------------
+ * Ngày bắt đầu yêu (YYYY-MM-DD), cố định — muốn đổi thì sửa ở đây.
+ * Ảnh & ghi chú trên trang chủ được lưu vào Firestore (nếu đã cấu hình ở trên)
+ * trong các collection: board_items, board_images, board_meta.
+ */
+export const START_DATE = "2026-09-26";

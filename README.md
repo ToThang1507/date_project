@@ -7,7 +7,25 @@ Tone màu: **hồng · xanh mint · xanh bơ** 🌸🌿🥑
 
 ---
 
-## ✨ Tính năng
+## 💗 Trang chủ "Our Time" (`index.html`)
+
+| Nhóm | Chi tiết |
+|---|---|
+| ⏱️ Bộ đếm | Đếm ngày · giờ · phút · giây kể từ ngày bắt đầu yêu **26/09/2026** (cố định, đổi ở `START_DATE` trong `assets/js/config.js`) |
+| 🖼️ Ảnh polaroid | Bấm **✎ Chỉnh sửa** → **Thêm ảnh**, hoặc kéo file ảnh từ máy thả thẳng vào trang (thả lên 1 ảnh có sẵn = đổi ảnh đó) |
+| ✋ Kéo thả | Bấm 1 lần để chọn rồi kéo đi bất cứ đâu; nút ↻ để xoay (giữ Shift để bắt góc 15°), nút ⤡ để đổi kích thước |
+| 📝 Sticky note | Mỗi ảnh có 1 tờ giấy note lời nhắn bên dưới; thêm ghi chú tự do bằng nút **Ghi chú**; **🎨 Màu giấy** để đổi màu (vàng · hồng · mint · xanh · chữ viết tay không nền) |
+| ✏️ Sửa chữ | Ở chế độ chỉnh sửa, bấm vào tiêu đề, dòng phụ, câu quote, chú thích ảnh để sửa trực tiếp |
+| 💾 Lưu trữ | Ảnh được nén (≤1280px) rồi lưu IndexedDB trên trình duyệt; có Firebase thì đồng bộ lên Firestore để mọi máy cùng thấy |
+| ⚙️ Settings | Xuất / nhập file sao lưu (.json, gồm cả ảnh), khôi phục mặc định |
+| 📱 Mobile | Ảnh & ghi chú xếp thành lưới dưới bộ đếm (vẫn sửa chữ, xoay, đổi ảnh được; kéo tự do chỉ có trên màn hình ≥ 900px) |
+
+> ⚠️ Nếu **chưa cấu hình Firebase**, ảnh chỉ nằm trên trình duyệt của máy đã thêm ảnh.
+> Muốn người ấy mở web cũng thấy ảnh → bật Firebase (bên dưới), hoặc Xuất file rồi Nhập ở máy kia.
+
+---
+
+## 🗓️ Trang lên lịch hẹn (`planner.html`)
 
 | Nhóm | Chi tiết |
 |---|---|
@@ -26,15 +44,20 @@ Tone màu: **hồng · xanh mint · xanh bơ** 🌸🌿🥑
 
 ```
 date-planner/
-├── index.html
+├── index.html          ← trang chủ Our Time (bộ đếm + bảng ảnh)
+├── planner.html        ← trang lên lịch hẹn
 ├── assets/
-│   ├── css/style.css
+│   ├── css/
+│   │   ├── home.css    ← giao diện trang chủ
+│   │   └── style.css   ← giao diện trang lên lịch
 │   └── js/
 │       ├── config.js   ← CHỈ CẦN SỬA FILE NÀY
+│       ├── home.js     ← trang chủ: bộ đếm, kéo thả ảnh, sticky note
+│       ├── board-store.js ← lưu ảnh/ghi chú: IndexedDB + Firestore
 │       ├── foods.js    ← danh sách món ăn
-│       ├── store.js    ← Firestore + localStorage
+│       ├── store.js    ← lịch sử hẹn: Firestore + localStorage
 │       ├── wheel.js    ← vòng quay
-│       └── app.js      ← logic chính
+│       └── app.js      ← logic trang lên lịch
 ├── .github/workflows/deploy.yml
 └── README.md
 ```
@@ -91,6 +114,10 @@ service cloud.firestore {
     match /dates/{doc} {
       allow read, write: if true;   // web riêng tư, không có đăng nhập
     }
+    // Trang chủ Our Time: ảnh, ghi chú, cài đặt
+    match /board_items/{doc}  { allow read, write: if true; }
+    match /board_images/{doc} { allow read, write: if true; }
+    match /board_meta/{doc}   { allow read, write: if true; }
   }
 }
 ```
@@ -149,7 +176,7 @@ Phần này tạm bỏ qua theo yêu cầu. Khi cần bật, có 3 hướng dễ
 - **Telegram Bot** — `https://api.telegram.org/bot<TOKEN>/sendMessage`, free không giới hạn.
 - **Discord Webhook** — `POST` vào URL webhook, setup nhanh nhất.
 
-Chỗ cần gắn: hàm `saveBtn` trong `assets/js/app.js`, ngay sau `await store.add(record)`.
+Chỗ cần gắn: hàm `saveBtn` trong `assets/js/app.js` (trang `planner.html`), ngay sau `await store.add(record)`.
 
 ---
 

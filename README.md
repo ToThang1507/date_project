@@ -17,6 +17,7 @@ Tone màu: **hồng · xanh mint · xanh bơ** 🌸🌿🥑
 | 📝 Sticky note | Mỗi ảnh có 1 tờ giấy note lời nhắn bên dưới; thêm ghi chú tự do bằng nút **Ghi chú**; **🎨 Màu giấy** để đổi màu (vàng · hồng · mint · xanh · chữ viết tay không nền) |
 | ✏️ Sửa chữ | Ở chế độ chỉnh sửa, bấm vào tiêu đề, dòng phụ, câu quote, chú thích ảnh để sửa trực tiếp |
 | 💾 Lưu trữ | Ảnh được nén (≤1280px) rồi lưu IndexedDB trên trình duyệt; có Firebase thì đồng bộ lên Firestore để mọi máy cùng thấy |
+| 🌄 Ảnh nền | **⚙ Settings → Chọn ảnh nền**, hoặc ở chế độ chỉnh sửa chọn 1 ảnh → **🌄 Làm nền**; bỏ ở **✕ Bỏ ảnh nền** |
 | ⚙️ Settings | Xuất / nhập file sao lưu (.json, gồm cả ảnh), khôi phục mặc định |
 | 📱 Mobile | Ảnh & ghi chú xếp thành lưới dưới bộ đếm (vẫn sửa chữ, xoay, đổi ảnh được; kéo tự do chỉ có trên màn hình ≥ 900px) |
 

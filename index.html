@@ -69,6 +69,7 @@
     <!-- Thanh công cụ của mục đang chọn -->
     <div class="item-bar" id="itemBar" hidden>
       <button type="button" data-act="replace">🖼 Đổi ảnh</button>
+      <button type="button" data-act="bg">🌄 Làm nền</button>
       <button type="button" data-act="color">🎨 Màu giấy</button>
       <button type="button" data-act="front">⬆ Lên trên</button>
       <button type="button" data-act="delete" class="danger">🗑 Xoá</button>
@@ -84,10 +85,11 @@
 
 <!-- ============ THANH CHỈNH SỬA ============ -->
 <div class="dock" id="dock" role="toolbar" aria-label="Công cụ chỉnh sửa">
-  <button type="button" id="addPhotoBtn">🖼 Thêm ảnh</button>
-  <button type="button" id="addNoteBtn">📝 Ghi chú</button>
+  <button type="button" id="addPhotoBtn"><span class="dock-ico">🖼</span> Thêm ảnh</button>
+  <button type="button" id="addNoteBtn"><span class="dock-ico">📝</span> Ghi chú</button>
+  <button type="button" id="addBgBtn"><span class="dock-ico">🌄</span> Ảnh nền</button>
   <span class="dock-hint">Bấm để chọn &amp; kéo · bấm lần nữa để sửa chữ · kéo ảnh từ máy thả vào trang</span>
-  <button type="button" id="doneEdit" class="primary">Xong ✓</button>
+  <button type="button" id="doneEdit" class="primary">Xong <span class="dock-ico">✓</span></button>
 </div>
 
 <div class="drop-hint" aria-hidden="true"><span>Thả ảnh vào đây 💗</span></div>
@@ -107,6 +109,14 @@
       <p class="muted" id="storeInfo">Đang kết nối…</p>
     </div>
     <div class="fld">
+      <span>Ảnh nền</span>
+      <div class="bg-preview" id="bgPreview" hidden></div>
+      <div class="row">
+        <label class="btn">🌄 Chọn ảnh nền<input type="file" id="bgInput" accept="image/*" hidden /></label>
+        <button type="button" class="btn" id="bgClearBtn" hidden>✕ Bỏ ảnh nền</button>
+      </div>
+    </div>
+    <div class="fld">
       <span>Sao lưu</span>
       <div class="row">
         <button type="button" class="btn" id="exportBtn">⬇ Xuất file sao lưu</button>
@@ -119,7 +129,7 @@
         <button type="button" class="btn danger" id="resetBtn">↺ Khôi phục mặc định</button>
       </div>
     </div>
-    <p class="muted tip">Mẹo: bấm <b>✎ Chỉnh sửa</b> để sửa tiêu đề, câu quote, thêm ảnh và kéo thả chúng khắp trang.</p>
+    <p class="muted tip">Mẹo: bấm <b>✎ Chỉnh sửa</b> để sửa tiêu đề, câu quote, thêm ảnh và kéo thả chúng khắp trang. Chọn 1 ảnh rồi bấm <b>🌄 Làm nền</b> để dùng nó làm ảnh nền.</p>
   </form>
 </dialog>
 

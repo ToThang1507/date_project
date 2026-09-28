@@ -70,6 +70,13 @@ body.editing .nav-edit{background:var(--pink-deep);border-color:var(--pink-deep)
     radial-gradient(900px 420px at 50% 0%, rgba(252,228,226,.55), transparent 70%),
     linear-gradient(180deg,#fbf6f2 0%,#f9f2ee 100%);
 }
+/* Ảnh nền do người dùng chọn: phủ lớp sáng để chữ & bộ đếm vẫn dễ đọc */
+.stage.has-bg{
+  background:
+    linear-gradient(180deg, rgba(251,246,242,.62) 0%, rgba(249,242,238,.5) 55%, rgba(249,242,238,.7) 100%),
+    var(--stage-bg) center / cover no-repeat;
+}
+.stage.has-bg .doodle{display:none}
 .doodle{
   position:absolute;z-index:0;pointer-events:none;
   fill:none;stroke:#e79aa7;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
@@ -293,8 +300,11 @@ body.dropping .drop-hint{opacity:1}
 }
 .btn:hover{background:var(--pink-soft)}
 .btn.danger{color:#c24a60;border-color:#f0c5cd}
+.btn[hidden]{display:none}
 .muted{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
 .tip{padding-top:4px;border-top:1px dashed var(--line)}
+.bg-preview{height:110px;margin-bottom:10px;border:1px solid var(--line);border-radius:12px;background:center / cover no-repeat}
+.bg-preview[hidden]{display:none}
 
 /* ---------- Toast ---------- */
 .toast{
@@ -350,5 +360,11 @@ body.dropping .drop-hint{opacity:1}
   .nav-link .lbl,.nav-edit .lbl{display:none}
   .date-pill{gap:14px;padding:10px 32px 10px 20px}
   .date-pill b{font-size:19px}
-  .dock button{padding:10px 14px;font-size:13px}
+  /* 4 nút chia đều: icon trên, chữ dưới (kiểu thanh tab) để không tràn màn hình */
+  .dock{gap:6px;padding:6px;border-radius:24px}
+  .dock button{
+    flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:8px 4px;border-radius:18px;font-size:11.5px;
+  }
+  .dock-ico{order:-1;font-size:18px;line-height:1}
 }

@@ -22,7 +22,7 @@ const PLACEHOLDERS = ["sunset", "hills"];
 const MIN_STAGE_H = 760;
 const flowMQ = matchMedia("(max-width: 899px)");   // mobile: ảnh xếp lưới, không kéo tự do
 
-const state = { settings: { ...DEFAULT_SETTINGS }, items: [], editing: false, selected: null };
+const state = { settings: { ...DEFAULT_SETTINGS }, items: [], background: null, editing: false, selected: null };
 const els = new Map();   // id -> element
 
 const stage = $("#stage");
@@ -147,6 +147,23 @@ function applySettings() {
   $$("[data-setting]").forEach(el => {
     if (document.activeElement !== el) el.textContent = state.settings[el.dataset.setting] ?? "";
   });
+}
+
+const isImageSrc = v => typeof v === "string" && v.startsWith("data:image/");
+
+function applyBackground() {
+  const bg = state.background;
+  stage.classList.toggle("has-bg", !!bg);
+  stage.style.setProperty("--stage-bg", bg ? `url("${bg}")` : "none");
+  $("#bgPreview").hidden = !bg;
+  $("#bgPreview").style.backgroundImage = bg ? `url("${bg}")` : "";
+  $("#bgClearBtn").hidden = !bg;
+}
+
+function setBackground(src) {
+  state.background = src;
+  applyBackground();
+  board.putBackground(src).catch(onSaveErr);
 }
 
 $$("[data-setting]").forEach(el => {
@@ -276,6 +293,7 @@ function positionBar() {
   if (!it) { bar.hidden = true; return; }
   bar.hidden = false;
   bar.querySelector('[data-act="replace"]').hidden = it.type !== "photo";
+  bar.querySelector('[data-act="bg"]').hidden = !it.src;
   const r = els.get(it.id).getBoundingClientRect();
   const s = stage.getBoundingClientRect();
   const bw = bar.offsetWidth, bh = bar.offsetHeight;
@@ -417,6 +435,9 @@ bar.addEventListener("click", e => {
   if (!act || !it) return;
   if (act === "replace") {
     pickImageFor(it.id);
+  } else if (act === "bg") {
+    setBackground(it.src);
+    toast("Đã đặt làm ảnh nền 🌄");
   } else if (act === "color") {
     const key = it.type === "photo" ? "noteColor" : "color";
     it[key] = NOTE_COLORS[(NOTE_COLORS.indexOf(it[key]) + 1) % NOTE_COLORS.length];
@@ -449,7 +470,7 @@ function removeItem(id) {
 // ============================================================
 
 /** Nén ảnh về JPEG (cạnh dài ≤ 1280px, < ~750KB) để lưu được nhiều ảnh & vừa 1 doc Firestore. */
-async function compressImage(file) {
+async function compressImage(file, maxSide = 1280, maxLen = 750_000) {
   const src = await createImageBitmap(file).catch(() => new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
@@ -459,7 +480,7 @@ async function compressImage(file) {
   }));
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
-  let side = 1280;
+  let side = maxSide;
   for (;;) {
     const scale = Math.min(1, side / Math.max(src.width, src.height));
     canvas.width = Math.round(src.width * scale);
@@ -469,7 +490,7 @@ async function compressImage(file) {
     ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
     for (let q = .85; q >= .5; q -= .1) {
       const url = canvas.toDataURL("image/jpeg", q);
-      if (url.length < 750_000) return url;
+      if (url.length < maxLen) return url;
     }
     side = Math.round(side * .75);
   }
@@ -555,6 +576,7 @@ $("#replaceInput").addEventListener("change", e => {
 });
 
 $("#addPhotoBtn").addEventListener("click", () => $("#fileInput").click());
+$("#addBgBtn").addEventListener("click", () => $("#bgInput").click());
 $("#fileInput").addEventListener("change", e => {
   addPhotos(e.target.files);
   e.target.value = "";
@@ -624,9 +646,33 @@ function showStoreInfo() {
     : "💾 <b>Lưu trên trình duyệt này.</b> Máy khác sẽ không thấy ảnh — cấu hình Firebase trong <code>assets/js/config.js</code> để đồng bộ, hoặc dùng Xuất / Nhập file.";
 }
 
+// Ảnh nền: cho phép to hơn ảnh polaroid (vẫn < 1MB / doc Firestore)
+$("#bgInput").addEventListener("change", async e => {
+  const f = e.target.files[0];
+  e.target.value = "";
+  if (!f) return;
+  if (!isImage(f)) return toast("Chỉ nhận file ảnh thôi nha 📷");
+  try {
+    toast("Đang xử lý ảnh nền…");
+    setBackground(await compressImage(f, 1920, 900_000));
+    toast("Đã đổi ảnh nền 🌄");
+  } catch (err) {
+    console.warn(err);
+    toast("Không đọc được ảnh: " + err.message);
+  }
+});
+
+$("#bgClearBtn").addEventListener("click", () => {
+  setBackground(null);
+  toast("Đã bỏ ảnh nền");
+});
+
 $("#exportBtn").addEventListener("click", () => {
   flush();
-  const data = { app: "our-time", version: 1, exportedAt: new Date().toISOString(), settings: state.settings, items: state.items };
+  const data = {
+    app: "our-time", version: 1, exportedAt: new Date().toISOString(),
+    settings: state.settings, items: state.items, background: state.background
+  };
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
   a.download = `our-time-${new Date().toISOString().slice(0, 10)}.json`;
@@ -642,7 +688,8 @@ $("#importInput").addEventListener("change", async e => {
     const data = JSON.parse(await f.text());
     if (!Array.isArray(data.items)) throw new Error("File không đúng định dạng");
     if (!confirm("Nhập file sẽ thay thế toàn bộ ảnh & ghi chú hiện tại. Tiếp tục?")) return;
-    await resetTo(sanitizeSettings(data.settings), data.items.map(sanitizeItem).filter(Boolean));
+    await resetTo(sanitizeSettings(data.settings), data.items.map(sanitizeItem).filter(Boolean),
+                  isImageSrc(data.background) ? data.background : null);
     toast("Đã nhập dữ liệu 💗");
   } catch (err) {
     console.warn(err);
@@ -656,16 +703,18 @@ $("#resetBtn").addEventListener("click", async () => {
   toast("Đã khôi phục mặc định");
 });
 
-async function resetTo(settings, items) {
+async function resetTo(settings, items, background = null) {
   for (const { t } of pending.values()) clearTimeout(t);
   pending.clear();
   state.settings = settings;
   state.items = items;
+  state.background = background;
   state.selected = null;
   applySettings();
+  applyBackground();
   renderBoard();
   dlg.close();
-  await board.replaceAll(settings, items).catch(onSaveErr);
+  await board.replaceAll(settings, items, background).catch(onSaveErr);
 }
 
 // ============================================================
@@ -690,14 +739,16 @@ async function init() {
   showStoreInfo();
   const data = await board.load().catch(err => { console.warn("[home] load lỗi:", err); return null; });
 
+  state.background = isImageSrc(data?.background) ? data.background : null;
   if (!data || (!data.settings && !data.items.length)) {
     state.items = seedItems();
-    board.replaceAll(state.settings, state.items).catch(onSaveErr);
+    board.replaceAll(state.settings, state.items, state.background).catch(onSaveErr);
   } else {
     state.settings = sanitizeSettings(data.settings);
     state.items = data.items.map(sanitizeItem).filter(Boolean);
   }
   applySettings();
+  applyBackground();
   renderBoard();
   showStoreInfo();
 

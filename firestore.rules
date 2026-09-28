@@ -1,0 +1,47 @@
+// Dán toàn bộ file này vào Firebase Console → Firestore Database → Rules → Publish.
+// Không cần đăng nhập: ai có link cũng xem, thêm, sửa, xoá được.
+// Rules chỉ chặn dữ liệu rác (sai collection, sai field, quá lớn) — không chặn được người phá.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function d() { return request.resource.data; }
+    function optStr(k, n) { return !(k in d()) || d()[k] == null || (d()[k] is string && d()[k].size() <= n); }
+    function optNum(k)    { return !(k in d()) || d()[k] is number; }
+
+    // Trang chủ: vị trí + chữ của từng ảnh / ghi chú
+    match /board_items/{id} {
+      allow read, delete: if true;
+      allow create, update: if id.size() <= 64
+        && d().keys().hasOnly(['id', 'type', 'x', 'y', 'w', 'rot', 'z', 'text', 'color',
+                               'placeholder', 'tape', 'caption', 'note', 'noteColor'])
+        && d().type in ['photo', 'note']
+        && optNum('x') && optNum('y') && optNum('w') && optNum('rot') && optNum('z')
+        && optStr('text', 2000) && optStr('caption', 2000) && optStr('note', 2000)
+        && optStr('color', 20) && optStr('noteColor', 20) && optStr('tape', 20) && optStr('placeholder', 20);
+    }
+
+    // Trang chủ: ảnh đã nén (data URL, < 1MB)
+    match /board_images/{id} {
+      allow read, delete: if true;
+      allow create, update: if id.size() <= 64
+        && d().keys().hasOnly(['src'])
+        && d().src is string && d().src.size() < 1000000;
+    }
+
+    // Trang chủ: tiêu đề, dòng phụ, câu quote
+    match /board_meta/{id} {
+      allow read: if true;
+      allow write: if id == 'settings'
+        && d().keys().hasOnly(['title', 'subtitle', 'quote'])
+        && optStr('title', 300) && optStr('subtitle', 300) && optStr('quote', 300);
+    }
+
+    // Trang lên lịch hẹn
+    match /dates/{id} {
+      allow read, delete: if true;
+      allow create, update: if d().keys().size() <= 20
+        && optStr('place', 500) && optStr('note', 2000) && optStr('me', 100) && optStr('her', 100);
+    }
+  }
+}

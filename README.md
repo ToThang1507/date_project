@@ -58,6 +58,7 @@ date-planner/
 │       ├── store.js    ← lịch sử hẹn: Firestore + localStorage
 │       ├── wheel.js    ← vòng quay
 │       └── app.js      ← logic trang lên lịch
+├── firestore.rules     ← dán vào Firebase Console → Firestore → Rules
 ├── .github/workflows/deploy.yml
 └── README.md
 ```
@@ -98,33 +99,21 @@ export const firebaseConfig = {
 };
 ```
 
-5. Menu trái → **Build → Firestore Database → Create database** → chọn **Start in test mode** → chọn region `asia-southeast1`.
+5. Menu trái → **Build → Firestore Database → Create database** → chọn region `asia-southeast1`.
 6. Xong! Reload web, badge góc phải sẽ hiện **Firebase ☁️**.
 
 > **Nếu chưa cấu hình gì**, web vẫn chạy 100% và lưu lịch sử vào trình duyệt (badge hiện **Lưu trên máy 💾**).
 
-### Rules nên dùng sau khi test xong
+### 🛡️ Rules (bắt buộc)
 
-Test mode sẽ hết hạn sau 30 ngày. Vào **Firestore → Rules** và dán:
+Không cần đăng nhập: **ai có link cũng xem, thêm, sửa, xoá** ảnh và lịch hẹn được.
+File `firestore.rules` chỉ chặn dữ liệu rác (sai collection, sai field, ảnh quá 1MB) và thay cho test mode
+(test mode sẽ khoá hết sau 30 ngày).
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /dates/{doc} {
-      allow read, write: if true;   // web riêng tư, không có đăng nhập
-    }
-    // Trang chủ Our Time: ảnh, ghi chú, cài đặt
-    match /board_items/{doc}  { allow read, write: if true; }
-    match /board_images/{doc} { allow read, write: if true; }
-    match /board_meta/{doc}   { allow read, write: if true; }
-  }
-}
-```
+Mở `firestore.rules` → copy toàn bộ → **Firestore Database → Rules** → dán đè → **Publish**.
 
-⚠️ Rule này cho phép mọi người biết `projectId` đều ghi được. Đây là web cá nhân
-nhỏ nên chấp nhận được; nếu muốn chặt hơn thì bật **Firebase Authentication
-(Anonymous / Google)** rồi đổi thành `if request.auth != null;`.
+> ⚠️ Vì không có đăng nhập, người lạ có link cũng xoá được ảnh. Thỉnh thoảng vào **⚙ Settings → Xuất file sao lưu**
+> để giữ một bản dự phòng, và đừng đăng link lên chỗ công khai.
 
 ---
 
